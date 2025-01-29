@@ -9,8 +9,8 @@ import { PrismaClient } from '@prisma/client';
 //Propio
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PagiantionDto } from 'src/common';
 import { Product } from './entities/product.entity';
+import { PagiantionDto } from 'src/common';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -29,18 +29,24 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   public async findAll(paginationDto: PagiantionDto): Promise<Product[]> {
     const { limit, page } = paginationDto;
 
-    const totalPage = await this.product.count();
+    const totalPage = await this.product.count({ where: { available: true } });
     const lastPage = Math.ceil(totalPage / limit);
     console.log(`Total page: ${totalPage} - LastPage: ${lastPage}`);
     return await this.product.findMany({
       take: limit,
       skip: (page - 1) * limit,
+      where: {
+        available: true,
+      },
     });
   }
 
   public async findOne(id: number): Promise<Product> {
     const product = await this.product.findFirst({
-      where: { id },
+      where: {
+        id,
+        available: true,
+      },
     });
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
@@ -52,17 +58,27 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _, ...data } = updateProductDto;
+
     await this.findOne(id);
 
     return await this.product.update({
       where: { id },
-      data: updateProductDto,
+      data: data,
     });
   }
 
   public async remove(id: number): Promise<Product> {
     await this.findOne(id);
 
-    return await this.product.delete({ where: { id } });
+    //return await this.product.delete({ where: { id } });
+
+    return await this.product.update({
+      where: { id },
+      data: {
+        available: false,
+      },
+    });
   }
 }
