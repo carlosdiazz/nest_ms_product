@@ -1,11 +1,12 @@
 import {
+  HttpStatus,
   Injectable,
   Logger,
-  NotFoundException,
+  //NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-
+import { RpcException } from '@nestjs/microservices';
 //Propio
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -29,9 +30,9 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   public async findAll(paginationDto: PagiantionDto): Promise<Product[]> {
     const { limit, page } = paginationDto;
 
-    const totalPage = await this.product.count({ where: { available: true } });
-    const lastPage = Math.ceil(totalPage / limit);
-    console.log(`Total page: ${totalPage} - LastPage: ${lastPage}`);
+    //const totalPage = await this.product.count({ where: { available: true } });
+    //const lastPage = Math.ceil(totalPage / limit);
+    //console.log(`Total page: ${totalPage} - LastPage: ${lastPage}`);
     return await this.product.findMany({
       take: limit,
       skip: (page - 1) * limit,
@@ -49,7 +50,11 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       },
     });
     if (!product) {
-      throw new NotFoundException(`Product with id ${id} not found`);
+      //throw new NotFoundException(`Product with id ${id} not found`);
+      throw new RpcException({
+        message: `Product with id ${id} not found`,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
     return product;
   }
