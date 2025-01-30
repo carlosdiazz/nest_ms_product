@@ -8,7 +8,7 @@ import {
 import { PrismaClient } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
 //Propio
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateItemProduct, CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { PagiantionDto } from 'src/common';
@@ -85,5 +85,28 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
         available: false,
       },
     });
+  }
+
+  public async validateProducts(createItemProduct: CreateItemProduct) {
+    const { ids } = createItemProduct;
+    const new_ids = Array.from(new Set(ids));
+
+    const products = await this.product.findMany({
+      where: {
+        available: true,
+        id: {
+          in: new_ids,
+        },
+      },
+    });
+
+    if (products.length !== new_ids.length) {
+      throw new RpcException({
+        message: 'Some products were not found',
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+
+    return products;
   }
 }

@@ -1,5 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import {
+  Transport,
+  MicroserviceOptions,
+  RpcException,
+} from '@nestjs/microservices';
 import { Logger, ValidationPipe } from '@nestjs/common';
 
 //Propio
@@ -25,6 +29,13 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true, // Remueve todo lo que no está incluído en los DTOs
       forbidNonWhitelisted: true, // Retorna bad request si hay propiedades en el objeto no requeridas
+      exceptionFactory: (errors) =>
+        new RpcException({
+          status: 400,
+          message: errors
+            .map((err) => Object.values(err.constraints ?? ''))
+            .join(', '),
+        }),
     }),
   );
 

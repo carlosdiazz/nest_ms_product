@@ -14,7 +14,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 //Propio
 import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateItemProduct, CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PagiantionDto } from 'src/common';
 
@@ -69,5 +69,12 @@ export class ProductsController {
     //@Param('id', ParseIntPipe) id: number
   ): Promise<Product> {
     return await this.productsService.remove(id);
+  }
+
+  @MessagePattern({ name: 'validateProducts' })
+  public async validateProducts(
+    @Payload() createItemProduct: CreateItemProduct,
+  ) {
+    return await this.productsService.validateProducts(createItemProduct);
   }
 }
