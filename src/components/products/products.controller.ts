@@ -23,7 +23,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   //@Post()
-  @MessagePattern({ name: 'create_product' })
+  @MessagePattern('create_product')
   public async create(
     @Payload() createProductDto: CreateProductDto,
     //@Body() createProductDto: CreateProductDto,
@@ -32,7 +32,7 @@ export class ProductsController {
   }
 
   //@Get()
-  @MessagePattern({ name: 'find_all_product' })
+  @MessagePattern('find_all_product')
   public async findAll(
     @Payload() paginationDto: PagiantionDto,
     //@Query() paginationDto: PagiantionDto,
@@ -41,7 +41,7 @@ export class ProductsController {
   }
 
   //@Get(':id')
-  @MessagePattern({ name: 'find_product' })
+  @MessagePattern('find_product')
   public async findOne(
     @Payload('id', ParseIntPipe) id: number,
     //@Param('id', ParseIntPipe) id: number,
@@ -50,7 +50,7 @@ export class ProductsController {
   }
 
   //@Patch(':id')
-  @MessagePattern({ name: 'update_product' })
+  @MessagePattern('update_product')
   public async update(
     @Payload() updateProductDto: UpdateProductDto,
     //@Param('id', ParseIntPipe) id: number,
@@ -63,7 +63,7 @@ export class ProductsController {
   }
 
   //@Delete(':id')
-  @MessagePattern({ name: 'remove_product' })
+  @MessagePattern('remove_product')
   public async remove(
     @Payload('id', ParseIntPipe) id: number,
     //@Param('id', ParseIntPipe) id: number
@@ -71,7 +71,7 @@ export class ProductsController {
     return await this.productsService.remove(id);
   }
 
-  @MessagePattern({ name: 'validateProducts' })
+  @MessagePattern('validateProducts')
   public async validateProducts(
     @Payload() createItemProduct: CreateItemProduct,
   ) {
