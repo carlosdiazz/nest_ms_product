@@ -10,3 +10,10 @@
 ## Correr migraccion
 
 Para correr Migracion `npx prisma migrate dev --name nameExample`
+
+## PROD
+
+Para la imagen en Producion ejecutar:
+```
+  docker build -f dockerfile.prod -t ms-products.
+```
